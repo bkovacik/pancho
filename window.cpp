@@ -1,29 +1,37 @@
 #include "window.h"
 
-//basically copied from glfw documentation
-bool createWindow() {
+GLFWwindow* createWindow(int width, int height, wType type) {
 	GLFWwindow* window;
 
 	if (!glfwInit())
-		return -1;
+		return NULL;
 
-	window = glfwCreateWindow(640, 480, "Hello World!", NULL, NULL);
+	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+	switch(type) {
+		case WINDOWED:
+			window = glfwCreateWindow(width, height, "Hello World!", NULL, NULL); break;
+		case BORDERLESS:
+			glfwWindowHint(GLFW_DECORATED, false);
+			glfwWindowHint(GLFW_FLOATING, true);
+
+			window = glfwCreateWindow(width, height, "", NULL, NULL);
+
+			//center the window
+			glfwSetWindowPos(window, (mode->width-width)/2, (mode->height-height)/2); 
+
+			break;
+		case FULLSCREEN:
+			window = glfwCreateWindow(width, height, "", glfwGetPrimaryMonitor(), NULL); break;
+		default:
+			return NULL;
+	}
+
 	if (!window)
     	{
 		glfwTerminate();
-		return -1;
+		return NULL;
 	}
 
-	glfwMakeContextCurrent(window);
-
-	while (!glfwWindowShouldClose(window))
-	{
-		glfwSwapBuffers(window);
-
-		glfwPollEvents();
-	}
-	
-	glfwTerminate();
-	return 0;
-	
+	return window;	
 }
