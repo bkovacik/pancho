@@ -1,1 +1,1 @@
-g++ -std=c++11 main.cpp window.cpp -lglfw3 -lglu32 -lopengl32 -lgdi32
+g++ -std=c++11 src/main.cpp src/window.cpp -lglew32 -lglfw3 -lopengl32 -lgdi32

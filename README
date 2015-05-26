@@ -1,1 +1,9 @@
-HON HON HON LES BAGUETTES
+download glfw
+put the mingw libraries in mingw64\lib
+put GLFW folder in mingw64\lib\gcc\x86_64-w64-mingw32\4.9.2\include
+
+download glew
+rename glew32.lib -> libglew32.a (can be found in lib\Release\x64)
+put it in mingw64\lib
+put GL folder in mingw64\lib\gcc\x86_64-w64-mingw32\4.9.2\include
+
