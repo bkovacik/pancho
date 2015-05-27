@@ -1,9 +1,14 @@
-download glfw
+we're using mingw-w64 (http://mingw-w64.yaxm.org/doku.php/download/mingw-builds)
+
+download glfw (https://github.com/glfw/glfw/releases/download/3.1.1/glfw-3.1.1.bin.WIN64.zip)
 put the mingw libraries in mingw64\lib
 put GLFW folder in mingw64\lib\gcc\x86_64-w64-mingw32\4.9.2\include
 
-download glew
-rename glew32.lib -> libglew32.a (can be found in lib\Release\x64)
-put it in mingw64\lib
+download glew (https://sourceforge.net/projects/glew/files/glew/1.12.0/glew-1.12.0-win32.zip/download)
+put glew32s.lib (can be found in lib\Release\x64) in mingw64\lib
 put GL folder in mingw64\lib\gcc\x86_64-w64-mingw32\4.9.2\include
+
+I get a warning "corrupt .drectve at end of def file." This seems not to affect the program, but I am currently waiting on a more definitive answer.
+
+CURRENTLY LOOKING INTO: OpenAL for audio
 
