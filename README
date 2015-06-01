@@ -11,11 +11,13 @@ download glew (https://sourceforge.net/projects/glew/files/glew/1.12.0/glew-1.12
 put glew32s.lib (can be found in lib\Release\x64) in LIB_DIR
 put GL folder in INC_DIR
 
-download zlib and libpng ()
+download zlib and libpng (https://drive.google.com/file/d/0BxI_Tbj2QWS3WVhuTmZaRnVzdDA/view?usp=sharing)
 put the .a's in LIB_DIR
 put the .h's in INC_DIR
 
 I get a warning "corrupt .drectve at end of def file." This seems not to affect the program, but I am currently waiting on a more definitive answer.
+
+I had to compile zlib/libpng myself, so hopefully it works for you guys as well.
 
 CURRENTLY LOOKING INTO: OpenAL for audio
 
