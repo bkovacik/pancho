@@ -1,12 +1,11 @@
 //window.h
 
-#include "GLFW/glfw3.h"
-#include <chrono>
-#include <thread>
-#include <iostream>
-
 #ifndef WINDOW_H
 #define WINDOW_H
+
+#include <GLFW/glfw3.h>
+#include <chrono>
+#include <thread>
 
 enum wType {WINDOWED, BORDERLESS, FULLSCREEN};
 

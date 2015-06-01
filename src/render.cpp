@@ -1,0 +1,163 @@
+#include "render.h"
+
+Render::Render(int width, int height, unsigned char* image_data, GLFWwindow* window) {
+	this->width = width;
+	this->height = height;
+	this->window = window;
+
+	glewExperimental = GL_TRUE;
+	if (glewInit() != GLEW_OK)
+		exit(-1);
+
+	initVertexShader();
+	initFragmentShader();
+	initShader();
+
+	//create vao
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	//init vbo
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(GLfloat), &vertices[0], GL_DYNAMIC_DRAW);
+
+	//init ebo
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size()*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
+
+	GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+	glEnableVertexAttribArray(posAttrib);
+	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+
+	GLint texAttrib = glGetAttribLocation(shaderProgram, "texcoord");
+	glEnableVertexAttribArray(texAttrib);
+	glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+
+	bindTexture(image_data);
+}
+
+Render::~Render() {
+
+}
+
+void Render::initVertexShader() {
+	vertexSource =
+		"#version 330 core\n"
+		"in vec2 texcoord;"
+		"in vec2 position;"
+		"out vec2 Texcoord;"
+		"void main() {"
+		"	Texcoord = texcoord;"
+		"	gl_Position = vec4(position, 0.0, 1.0);"
+		"}";
+
+	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexSource, NULL);
+	glCompileShader(vertexShader);
+}
+
+void Render::initFragmentShader() {
+	fragmentSource =
+		"#version 330 core\n"
+		"in vec2 Texcoord;"
+		"out vec4 outColor;"
+		"uniform sampler2D tex;"
+		"void main() {"
+		"	outColor = texture(tex, Texcoord);"
+		"}";
+
+	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
+	glCompileShader(fragmentShader);
+}
+
+void Render::initShader() {
+	//init and "compile" the shader
+	shaderProgram = glCreateProgram();
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+
+	glBindFragDataLocation(shaderProgram, 0, "outColor");
+	glLinkProgram(shaderProgram);
+	glUseProgram(shaderProgram);
+}
+
+void Render::bindTexture(unsigned char* image_data) {
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glEnable( GL_TEXTURE_2D );
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
+}
+
+void Render::addImage(int x, int y, const Coords& coords) {
+	int windowX, windowY,
+		offX = coords.endX-coords.beginX,
+		offY = coords.endY-coords.beginY;
+	glfwGetWindowSize(window, &windowX, &windowY);
+
+	float 	bx = x*2.0/windowX - 1.0,
+		by = y*2.0/windowY - 1.0,
+		ex = bx + (offX*2.0)/windowX,
+		ey = by + (offY*2.0)/windowY,
+		cbx = (float)coords.beginX/width,
+		cby = (float)coords.beginY/height,
+		cex = (float)coords.endX/width,
+		cey = (float)coords.endY/height;
+
+	GLfloat v[] = {
+		bx, ey, cbx, cby,	//Top-left
+		ex, ey, cex, cby,	//Top-right
+		bx, by, cbx, cey,	//Bottom-left
+		ex, by, cex, cey,	//Bottom-right
+	};
+	vertices.insert(vertices.end(), v, v+sizeof(v)/sizeof(GLfloat));
+
+	//add degenerate triangles first
+	GLuint end = 0;
+	if (elements.size()) {
+		end = elements.back();
+		elements.push_back(end);
+		elements.push_back(++end);
+	}
+
+	//then add the new quad
+	for (GLuint i = end; i < end+4; i++)
+		elements.push_back(i);
+}
+
+void Render::render() {
+	glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(GLfloat), &vertices[0], GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size()*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
+
+	std::cout << glGetError();
+
+	while (!glfwWindowShouldClose(window))
+	{
+		glfwPollEvents();
+
+		glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		glDrawElements(GL_TRIANGLE_STRIP, elements.size(), GL_UNSIGNED_INT, 0);
+
+		glfwSwapBuffers(window);
+	}
+	
+	glfwTerminate();
+}
