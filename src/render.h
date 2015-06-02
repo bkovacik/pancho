@@ -11,26 +11,32 @@
 #include "atlas.h"
 #include <iostream>
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods); 
+
 class Render {
 	private:
 		void initVertexShader();
 		void initFragmentShader();
 		void initShader();
 		void bindTexture(unsigned char* image_data);
+		void shiftImage(float offX, float offY, int objOffset);
 
 		const GLchar* vertexSource;
 		const GLchar* fragmentSource;
 		GLuint shaderProgram, fragmentShader, vertexShader;
-		GLuint vbo, ebo;
+		GLuint vbo, ebo, vao;
 		std::vector<GLfloat> vertices;
+		std::vector<GLfloat> move;
 		std::vector<GLuint> elements;
 		GLFWwindow* window;
-		int width, height;
+		int width, height, frames;
+		double lastTime;
 	public:
 		Render(int widght, int height, unsigned char* image_data, GLFWwindow* window);
 		~Render();
 		void addImage(int x, int y, const Coords& coords);
-		void render();
+		void setMovement(float offX, float offY, int objOffset);
+		void render(int fps);
 };
 
 #endif 

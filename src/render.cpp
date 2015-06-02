@@ -4,6 +4,8 @@ Render::Render(int width, int height, unsigned char* image_data, GLFWwindow* win
 	this->width = width;
 	this->height = height;
 	this->window = window;
+	this->frames = 0;
+	this->lastTime = glfwGetTime();
 
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK)
@@ -14,7 +16,6 @@ Render::Render(int width, int height, unsigned char* image_data, GLFWwindow* win
 	initShader();
 
 	//create vao
-	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
@@ -40,7 +41,14 @@ Render::Render(int width, int height, unsigned char* image_data, GLFWwindow* win
 }
 
 Render::~Render() {
+	glDeleteProgram(shaderProgram);
+	glDeleteShader(fragmentShader);
+	glDeleteShader(vertexShader);
 
+	glDeleteBuffers(1, &ebo);
+	glDeleteBuffers(1, &vbo);
+
+	glDeleteVertexArrays(1, &vao);
 }
 
 void Render::initVertexShader() {
@@ -105,6 +113,23 @@ void Render::bindTexture(unsigned char* image_data) {
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
 }
 
+void Render::shiftImage(float offX, float offY, int objOffset) {
+	int windowX, windowY;
+	glfwGetWindowSize(window, &windowX, &windowY);
+
+	float 	ox = offX/windowX,
+		oy = offY/windowY;
+
+	for (int i = objOffset; i < objOffset+16; i+=4) {
+		vertices[i] += ox;
+		vertices[i+1] += oy;
+	}
+
+	glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size()*sizeof(GLfloat), &vertices[0]);
+}
+
+//takes x and y values as coords the image is supposed to be placed at
+//the coords structure is gotten from the texture atlas
 void Render::addImage(int x, int y, const Coords& coords) {
 	int windowX, windowY,
 		offX = coords.endX-coords.beginX,
@@ -128,6 +153,8 @@ void Render::addImage(int x, int y, const Coords& coords) {
 	};
 	vertices.insert(vertices.end(), v, v+sizeof(v)/sizeof(GLfloat));
 
+	move.insert(move.end(), 2, 0.0);
+
 	//add degenerate triangles first
 	GLuint end = 0;
 	if (elements.size()) {
@@ -141,22 +168,36 @@ void Render::addImage(int x, int y, const Coords& coords) {
 		elements.push_back(i);
 }
 
-void Render::render() {
+void Render::setMovement(float offX, float offY, int objOffset) {
+	move[objOffset++] = offX;
+	move[objOffset] = offY;
+}
+
+//renders the vertices at the given fps
+void Render::render(int fps) {
 	glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(GLfloat), &vertices[0], GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size()*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
 
-	std::cout << glGetError();
+	double delay = 1.0/fps;
 
 	while (!glfwWindowShouldClose(window))
 	{
-		glfwPollEvents();
+		double currentTime = glfwGetTime();
+		if (currentTime - lastTime >= delay) {
+			lastTime = currentTime;
+			glfwPollEvents();
 
-		glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+			glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
 
-		glDrawElements(GL_TRIANGLE_STRIP, elements.size(), GL_UNSIGNED_INT, 0);
+			for (int i = 0; i < move.size(); i+=2)
+				//normalize movement by fps
+				shiftImage(move[i]/fps, move[i+1]/fps,i*8);
 
-		glfwSwapBuffers(window);
+			glDrawElements(GL_TRIANGLE_STRIP, elements.size(), GL_UNSIGNED_INT, 0);
+
+			glfwSwapBuffers(window);
+		}
 	}
 	
 	glfwTerminate();
