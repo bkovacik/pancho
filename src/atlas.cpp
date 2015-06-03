@@ -19,20 +19,20 @@ Atlas::Atlas(const char* name) {
 			break;
 
 		std::string key;
-		index = str.find(" ");
+		index = str.find(",");
 		key = str.substr(0, index);
 
 		textures[key] = Coords();
 
 		index++;
 		textures[key].beginX = std::stoi(str.substr(index, str.find(" ", index)-index));
-		index = str.find(" ", index)+1;
+		index = str.find(",", index)+1;
 
 		textures[key].beginY = std::stoi(str.substr(index, str.find(" ", index)-index));
-		index = str.find(" ", index)+1;
+		index = str.find(",", index)+1;
 
 		textures[key].endX = std::stoi(str.substr(index, str.find(" ", index)-index));
-		index = str.find(" ", index)+1;
+		index = str.find(",", index)+1;
 
 		textures[key].endY = std::stoi(str.substr(index));
 	}

@@ -9,7 +9,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 int main() {
 	Image image = Image("resources/atlas.png");
-	Atlas atlas = Atlas("resources/atlasMap");
+	Atlas atlas = Atlas("resources/atlasMap.csv");
 
 	GLFWwindow* window = createWindow(640, 480, WINDOWED);
 	if (!window)
