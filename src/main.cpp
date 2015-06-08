@@ -4,14 +4,19 @@
 #include "image.h"
 #include "atlas.h"
 #include "level.h"
+#include "audio.h"
 
 Render * render; //needs to be global because GLFW is pure C
+Audio * audio;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 int main() {
 	Image image = Image("resources/atlas.png");
 	Atlas atlas = Atlas("resources/atlasMap.csv");
 	Level level = Level("resources/test_level.csv");
+	audio = new Audio();
+	audio->addSource(0, 0, "name");
+	audio->addAudio("Untitled.wav", "name", "resources/sounds/");
 
 	GLFWwindow* window = createWindow(640, 480, WINDOWED);
 	if (!window)
@@ -67,14 +72,17 @@ int main() {
 	}
 
 	delete(render);
+	delete(audio);
 	return 0;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	int x = 0, y = 0, move = 180.0;
 
-	if (glfwGetKey(window, GLFW_KEY_RIGHT))
+	if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
 		x += move;
+		audio->playSource("name");
+	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT))
 		x -= move;
 	if (glfwGetKey(window, GLFW_KEY_UP))

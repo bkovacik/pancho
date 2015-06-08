@@ -11,8 +11,6 @@
 
 class Image {
 	private:
-		void genTexture();
-
 		long width, height;
 		png_structp png_ptr;
 		png_infop info_ptr;
@@ -25,7 +23,6 @@ class Image {
 
 		long getWidth() { return width; }
 		long getHeight() { return height; }
-		GLuint getTexture() { return texture; }
 		unsigned char* getImage_data() { return image_data; }
 };
 
