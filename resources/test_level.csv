@@ -1,0 +1,12 @@
+Name, X location, Y location. First line of this file is ignored. Size = Level size from origin
+Size,1200,900
+Start,32,5
+Goal,500,300
+//Fifth line is ignored. Parsed by type, X, Y.
+Enemies
+type1,200,100
+type2,80,40
+type2,300,250
+Power-ups
+type1,100,180
+type4,40,200
