@@ -16,7 +16,7 @@ int main() {
 	Level level = Level("resources/test_level.csv");
 	audio = new Audio();
 	audio->addSource(0, 0, "name");
-	audio->addAudio("Untitled.wav", "name", "resources/sounds/");
+	audio->addAudio("oww.wav", "name", "resources/sounds/");
 
 	GLFWwindow* window = createWindow(640, 480, WINDOWED);
 	if (!window)
@@ -25,7 +25,12 @@ int main() {
 		glfwMakeContextCurrent(window);
 		glfwSetKeyCallback(window, key_callback);
 
-		render = new Render(64, 32, image.getImage_data(), window);
+		render = new Render(194, 130, image.getImage_data(), window);
+
+		for (int i = -128; i < 640; i+=128) {
+			for (int j = -128; j < 480; j+=128)
+				render->addImage(i, j, atlas.getCoords("background"));
+		}
 
 		if (level.getWidth() < 640 || level.getHeight() < 480 ||
 		 level.getHeight() < 0 || level.getWidth() < 0) {
@@ -79,10 +84,8 @@ int main() {
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	int x = 0, y = 0, move = 180.0;
 
-	if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
+	if (glfwGetKey(window, GLFW_KEY_RIGHT))
 		x += move;
-		audio->playSource("name");
-	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT))
 		x -= move;
 	if (glfwGetKey(window, GLFW_KEY_UP))
@@ -90,5 +93,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (glfwGetKey(window, GLFW_KEY_DOWN))
 		y -= move;
 
-	render->setMovement(x, y, 2);
+	for (int i = 0; i < 30; i++)
+		render->setMovement(-x, -y, i*2);
 }

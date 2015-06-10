@@ -4,6 +4,9 @@
 #define RENDER_H
 
 #define GLEW_STATIC
+#define BACK_TEX_WIDTH 128
+#define BACK_TEX_HEIGHT 128
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <cstdlib>
@@ -36,7 +39,7 @@ class Render {
 		~Render();
 		void addImage(int x, int y, const Coords& coords);
 		void setMovement(float offX, float offY, int objOffset);
-		void render(int fps);
+		void render(int fps, int scroll = 180);
 };
 
 #endif 

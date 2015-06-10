@@ -104,10 +104,10 @@ void Render::bindTexture(unsigned char* image_data) {
 	glEnable( GL_TEXTURE_2D );
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
 	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	float color[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, color);
@@ -138,8 +138,8 @@ void Render::addImage(int x, int y, const Coords& coords) {
 
 	float 	bx = x*2.0/windowX - 1.0,
 		by = y*2.0/windowY - 1.0,
-		ex = bx + (offX*2.0)/windowX,
-		ey = by + (offY*2.0)/windowY,
+		ex = bx + offX*2.0/windowX,
+		ey = by + offY*2.0/windowY,
 		cbx = (float)coords.beginX/width,
 		cby = (float)coords.beginY/height,
 		cex = (float)coords.endX/width,
@@ -174,11 +174,14 @@ void Render::setMovement(float offX, float offY, int objOffset) {
 }
 
 //renders the vertices at the given fps
-void Render::render(int fps) {
+void Render::render(int fps, int scroll) {
 	glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(GLfloat), &vertices[0], GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size()*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
 
+	int windowX, windowY;
 	double delay = 1.0/fps;
+
+	glfwGetWindowSize(window, &windowX, &windowY);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -187,12 +190,29 @@ void Render::render(int fps) {
 			lastTime = currentTime;
 			glfwPollEvents();
 
-			glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			for (int i = 0; i < move.size(); i+=2)
-				//normalize movement by fps
-				shiftImage(move[i]/fps, move[i+1]/fps,i*8);
+			for (int i = 0; i < move.size(); i+=2) {
+				int	xMove = scroll/fps,
+					yMove = scroll/fps,
+					//round up, add another tex dimension, then multiply whole thing by two, then subtract one step
+					xWrap = ((((windowX + BACK_TEX_WIDTH - 1) / BACK_TEX_WIDTH) * BACK_TEX_WIDTH) + BACK_TEX_WIDTH) * 2 - xMove,
+					yWrap = ((((windowY + BACK_TEX_HEIGHT - 1) / BACK_TEX_HEIGHT) * BACK_TEX_HEIGHT) + BACK_TEX_HEIGHT) * 2 - yMove;
+
+				//wrap background tiles around
+				if (vertices[i*8+4] < -1.0)
+					shiftImage(xWrap, 0, i*8);
+				if (vertices[i*8] > 1.0)
+					shiftImage(-xWrap, 0, i*8);
+				if (vertices[i*8+1] < -1.1)
+					shiftImage(0, yWrap, i*8);
+				if (vertices[i*8+9] > 1.1)
+					shiftImage(0, -yWrap, i*8);
+				else
+					//normalize movement by fps
+					shiftImage(move[i]/fps, move[i+1]/fps,i*8);
+			}
 
 			glDrawElements(GL_TRIANGLE_STRIP, elements.size(), GL_UNSIGNED_INT, 0);
 

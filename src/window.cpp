@@ -10,7 +10,7 @@ GLFWwindow* createWindow(int width, int height, wType type) {
 
 	switch(type) {
 		case WINDOWED:
-			window = glfwCreateWindow(width, height, "Hello World!", NULL, NULL); break;
+			window = glfwCreateWindow(width, height, "Pancho and the Cloak of a Million Colors", NULL, NULL); break;
 		case BORDERLESS:
 			glfwWindowHint(GLFW_DECORATED, false);
 			glfwWindowHint(GLFW_FLOATING, true);

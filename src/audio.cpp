@@ -47,6 +47,8 @@ void Audio::addAudio(std::string name, std::string sourceName, const char* path)
 
 	fin.close();
 
+	std::cout << size;
+
 	ALuint buffer;
 	alGenBuffers(1, &buffer);
 	alBufferData(buffer, FORMAT, audio[name], size, FREQUENCY);
