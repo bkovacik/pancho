@@ -19,6 +19,8 @@ download openALsoft (http://kcat.strangesoft.net/openal-soft-1.16.0-bin.zip)
 put the .dll.a (found in libs/Win64) in LIB_DIR
 put the entire AL folder in INC_DIR
 
+for tiles that need to be lined up and tiled seamlessly, they must have 1 pixel border that correctly interpolates between it and neighboring tiles. the tile is still read without the 1 pixel border.
+
 I get a warning "corrupt .drectve at end of def file." This seems not to affect the program, but I am currently waiting on a more definitive answer.
 
 I had to compile zlib/libpng myself, so hopefully it works for you guys as well.
