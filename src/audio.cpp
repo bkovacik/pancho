@@ -34,9 +34,16 @@ void Audio::addAudio(std::string name, std::string sourceName, const char* path)
 
 	char in[4];
 
-	//ignore most of header bytes
-	fin.seekg(40, fin.beg);
+	//find the data section
+	//need to check by 2s, but should be alright because we're reading header
+	do {
+		fin.seekg(0, std::ifstream::cur);
+		fin.read(in, 2);
+	} while (in[0] != 'd' || in[1] != 'a');
+	//skip the "ta"
+	fin.seekg(2, std::ifstream::cur);
 	fin.read(in, 4);
+
 	uint32_t size = 0;
 
 	for (int i = 0; i < 4; i++)
@@ -46,8 +53,6 @@ void Audio::addAudio(std::string name, std::string sourceName, const char* path)
 	fin.read(audio[name], size);
 
 	fin.close();
-
-	std::cout << size;
 
 	ALuint buffer;
 	alGenBuffers(1, &buffer);

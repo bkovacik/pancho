@@ -16,7 +16,7 @@ int main() {
 	Level level = Level("resources/test_level.csv");
 	audio = new Audio();
 	audio->addSource(0, 0, "name");
-	audio->addAudio("oww.wav", "name", "resources/sounds/");
+	audio->addAudio("power_down_chime.wav", "name", "resources/sounds/");
 
 	GLFWwindow* window = createWindow(640, 480, WINDOWED);
 	if (!window)
@@ -84,8 +84,10 @@ int main() {
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	int x = 0, y = 0, move = 180.0;
 
-	if (glfwGetKey(window, GLFW_KEY_RIGHT))
+	if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
+		audio->playSource("name");
 		x += move;
+	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT))
 		x -= move;
 	if (glfwGetKey(window, GLFW_KEY_UP))

@@ -196,18 +196,24 @@ void Render::render(int fps, int scroll) {
 			for (int i = 0; i < move.size(); i+=2) {
 				int	xMove = scroll/fps,
 					yMove = scroll/fps,
-					//round up, add another tex dimension, then multiply whole thing by two, then subtract one step
-					xWrap = ((((windowX + BACK_TEX_WIDTH - 1) / BACK_TEX_WIDTH) * BACK_TEX_WIDTH) + BACK_TEX_WIDTH) * 2 - xMove,
-					yWrap = ((((windowY + BACK_TEX_HEIGHT - 1) / BACK_TEX_HEIGHT) * BACK_TEX_HEIGHT) + BACK_TEX_HEIGHT) * 2 - yMove;
+					//round up
+					roundX = ((windowX + BACK_TEX_WIDTH - 1) / BACK_TEX_WIDTH) * BACK_TEX_WIDTH,
+					roundY = ((windowY + BACK_TEX_HEIGHT - 1) / BACK_TEX_HEIGHT) * BACK_TEX_HEIGHT,
+					//add another tex dimension, then multiply whole thing by two, then subtract one step
+					xWrap = (roundX + BACK_TEX_WIDTH) * 2 - xMove,
+					yWrap = (roundY + BACK_TEX_HEIGHT) * 2 - yMove;
+
+				float	wrapAtX = (float) roundX / windowX,
+					wrapAtY = (float) roundY / windowY;
 
 				//wrap background tiles around
-				if (vertices[i*8+4] < -1.0)
+				if (vertices[i*8+4] < -wrapAtX)
 					shiftImage(xWrap, 0, i*8);
-				if (vertices[i*8] > 1.0)
+				if (vertices[i*8] > wrapAtX)
 					shiftImage(-xWrap, 0, i*8);
-				if (vertices[i*8+1] < -1.1)
+				if (vertices[i*8+1] < -wrapAtY)
 					shiftImage(0, yWrap, i*8);
-				if (vertices[i*8+9] > 1.1)
+				if (vertices[i*8+9] > wrapAtY)
 					shiftImage(0, -yWrap, i*8);
 				else
 					//normalize movement by fps
