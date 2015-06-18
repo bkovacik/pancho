@@ -10,6 +10,12 @@
 class Coords {
 	public:
 		int beginX, beginY, endX, endY;
+		Coords(int beginX=0, int beginY=0, int endX=0, int endY=0) {
+			this->beginX = beginX;
+			this->beginY = beginY;
+			this->endX = endX;
+			this->endY = endY;
+		}
 };
 
 class Atlas {

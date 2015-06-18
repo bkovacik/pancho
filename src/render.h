@@ -37,6 +37,7 @@ class Render {
 	public:
 		Render(int widght, int height, unsigned char* image_data, GLFWwindow* window);
 		~Render();
+		void addImage(int x, int y, const Coords& coords, int offX, int offY);
 		void addImage(int x, int y, const Coords& coords);
 		void setMovement(float offX, float offY, int objOffset);
 		void render(int fps, int scroll = 180);

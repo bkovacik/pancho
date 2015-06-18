@@ -4,14 +4,14 @@
 #ifndef AUDIO_H
 #define AUDIO_H
 
+#define FREQUENCY 44100
+#define FORMAT AL_FORMAT_STEREO16
+
 #include <fstream>
 #include <stdint.h>
 #include <map>
 #include <AL/al.h>
 #include <AL/alc.h>
-
-#define FREQUENCY 44100
-#define FORMAT AL_FORMAT_STEREO16
 
 #include <iostream>
 

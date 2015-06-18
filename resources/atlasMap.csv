@@ -1,4 +1,16 @@
 Name BeginX BeginY EndX EndY. First line of this file is ignored.
+black,0,0,1,1
+white,1,0,2,1
+red,2,0,3,1
+orange,3,0,4,1
+yellow,4,0,5,1
+green,5,0,6,1
+blue,6,0,7,1
+indigo,7,0,8,1
+violet,8,0,9,1
 test,0,0,32,32
 test3,32,0,64,32
 background,65,1,193,129
+lifefull,0,32,32,64
+lifehalf,32,32,64,64
+lifeempty,0,64,32,96

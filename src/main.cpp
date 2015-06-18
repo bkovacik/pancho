@@ -25,16 +25,18 @@ int main() {
 		glfwMakeContextCurrent(window);
 		glfwSetKeyCallback(window, key_callback);
 
+		//bottom left = (0, 0)
 		render = new Render(194, 130, image.getImage_data(), window);
-
-		level.load(render, atlas);
 		
 		for (int i = -128; i < 640; i+=128) {
 			for (int j = -128; j < 480; j+=128)
 				render->addImage(i, j, atlas.getCoords("background"));
 		}
 
-		//bottom left = (0, 0)
+		level.load(render, atlas);
+
+		render->render(60);
+	}	
 
 	delete(render);
 	delete(audio);

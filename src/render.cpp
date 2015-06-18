@@ -130,10 +130,8 @@ void Render::shiftImage(float offX, float offY, int objOffset) {
 
 //takes x and y values as coords the image is supposed to be placed at
 //the coords structure is gotten from the texture atlas
-void Render::addImage(int x, int y, const Coords& coords) {
-	int windowX, windowY,
-		offX = coords.endX-coords.beginX,
-		offY = coords.endY-coords.beginY;
+void Render::addImage(int x, int y, const Coords& coords, int offX, int offY) {
+	int windowX, windowY;
 	glfwGetWindowSize(window, &windowX, &windowY);
 
 	float 	bx = x*2.0/windowX - 1.0,
@@ -166,6 +164,13 @@ void Render::addImage(int x, int y, const Coords& coords) {
 	//then add the new quad
 	for (GLuint i = end; i < end+4; i++)
 		elements.push_back(i);
+}
+
+void Render::addImage(int x, int y, const Coords& coords) {
+	int 	offX = coords.endX-coords.beginX,
+		offY = coords.endY-coords.beginY;
+
+	addImage(x, y, coords, offX, offY);
 }
 
 void Render::setMovement(float offX, float offY, int objOffset) {
