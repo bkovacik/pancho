@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <map>
+#include "render.h"
 
 class Point {
 	public:
@@ -29,6 +30,7 @@ public:
 	int getHeight() { return positions["Size"].pt_Y; }
 	int start(const std::string& cord);
 	int goal(const std::string& cord);
+	void load(Render* render, Atlas& atlas);
 
 	const std::map<Point, std::string>& getEnemies() { return enemies; }
 	const std::map<Point, std::string>& getPower_Ups() { return pwr_ups; }
