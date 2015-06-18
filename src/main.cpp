@@ -27,54 +27,14 @@ int main() {
 
 		render = new Render(194, 130, image.getImage_data(), window);
 
+		level.load(render, atlas);
+		
 		for (int i = -128; i < 640; i+=128) {
 			for (int j = -128; j < 480; j+=128)
 				render->addImage(i, j, atlas.getCoords("background"));
 		}
 
-		if (level.getWidth() < 640 || level.getHeight() < 480 ||
-		 level.getHeight() < 0 || level.getWidth() < 0) {
-			std::cerr << "ERROR: Level size is less than window size." << std::endl;
-		}
-
-		// Not sure how to implement full level size, 
-		// data is stored as X = level.getWidth(), Y = level.getHeight()
-
 		//bottom left = (0, 0)
-
-		// Load Pancho
-		if (level.start("X") > level.getWidth() || level.start("Y") > level.getHeight() ||
-		 level.start("X") < 0 || level.start("Y") < 0) {
-			std::cerr << "ERROR: Pancho is out of this world." << std::endl;
-		}
-		render->addImage(level.start("X"), level.start("Y"), atlas.getCoords("test3"));
-
-		// Load goal
-		if (level.goal("X") > level.getWidth() || level.goal("Y") > level.getHeight() ||
-		 level.goal("X") < 0 || level.goal("Y") < 0) {
-			std::cerr << "ERROR: Goal is out of this world." << std::endl;
-		}
-		render->addImage(level.goal("X"), level.goal("Y"), atlas.getCoords("test"));
-
-		// Load enemies
-		for (std::map<Point, std::string>::const_iterator enemies = level.getEnemies().begin(); enemies != level.getEnemies().end(); ++enemies) {
-			if (enemies->first.pt_X > level.getWidth() || enemies->first.pt_Y > level.getHeight() ||
-		 		enemies->first.pt_X < 0 || enemies->first.pt_Y < 0) {
-				std::cerr << "ERROR: Enemy is not within level bounds." << std::endl;
-			}
-		render->addImage(enemies->first.pt_X, enemies->first.pt_Y, atlas.getCoords("test"));
-		}
-
-		// Load Power-Ups
-		for (std::map<Point, std::string>::const_iterator items = level.getPower_Ups().begin(); items != level.getPower_Ups().end(); ++items) {
-			if (items->first.pt_X > level.getWidth() || items->first.pt_Y > level.getHeight() ||
-		 		items->first.pt_X < 0 || items->first.pt_Y < 0) {
-				std::cerr << "ERROR: Item is not within level bounds." << std::endl;
-			}
-		render->addImage(items->first.pt_X, items->first.pt_Y, atlas.getCoords("test3"));
-		}
-		render->render(60);
-	}
 
 	delete(render);
 	delete(audio);
