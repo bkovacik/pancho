@@ -1,16 +1,25 @@
 #include "atlas.h"
 
-Atlas::Atlas(const char* name) {
-	std::ifstream fin (name, std::ifstream::in);
+std::map<std::string, Coords> Atlas::textures_;
+int Atlas::width_, Atlas::height_;
+Atlas::InitAtlas Atlas::init;
+
+Atlas::InitAtlas::InitAtlas() {
+	std::ifstream fin (ATLASNAME, std::ifstream::in);
 
 	std::string str;
 
 	//Discard the first line
 	getline(fin, str);
-	std::string remain;
+
+	getline(fin, str);
+
+	int index = str.find(",", index);
+	width_ = std::stoi(str.substr(0, index));
+	height_ = std::stoi(str.substr(index+1));
 
 	while (fin.good()) {
-		int index = 0;
+		index = 0;
 
 		getline(fin, str);
 
@@ -22,19 +31,19 @@ Atlas::Atlas(const char* name) {
 		index = str.find(",");
 		key = str.substr(0, index);
 
-		textures[key] = Coords();
+		textures_[key] = Coords();
 
 		index++;
-		textures[key].beginX = std::stoi(str.substr(index, str.find(" ", index)-index));
+		textures_[key].beginX = std::stoi(str.substr(index, str.find(",", index)));
 		index = str.find(",", index)+1;
 
-		textures[key].beginY = std::stoi(str.substr(index, str.find(" ", index)-index));
+		textures_[key].beginY = std::stoi(str.substr(index, str.find(",", index)));
 		index = str.find(",", index)+1;
 
-		textures[key].endX = std::stoi(str.substr(index, str.find(" ", index)-index));
+		textures_[key].endX = std::stoi(str.substr(index, str.find(",", index)));
 		index = str.find(",", index)+1;
 
-		textures[key].endY = std::stoi(str.substr(index));
+		textures_[key].endY = std::stoi(str.substr(index));
 	}
 
 	fin.close();

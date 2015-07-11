@@ -8,11 +8,11 @@
 #define BACK_TEX_HEIGHT 128
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <cstdlib>
 #include <vector>
 #include "atlas.h"
-#include <iostream>
+#include "level.h"
+#include "window.h"
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods); 
 
@@ -23,6 +23,7 @@ class Render {
 		void initShader();
 		void bindTexture(unsigned char* image_data);
 		void shiftImage(float offX, float offY, int objOffset);
+		void genElements(int max);
 
 		const GLchar* vertexSource;
 		const GLchar* fragmentSource;
@@ -31,16 +32,15 @@ class Render {
 		std::vector<GLfloat> vertices;
 		std::vector<GLfloat> move;
 		std::vector<GLuint> elements;
-		GLFWwindow* window;
-		int width, height, frames;
+		int width, height, frames, moveX, moveY;
 		double lastTime;
 	public:
-		Render(int widght, int height, unsigned char* image_data, GLFWwindow* window);
+		Render(int widght, int height, unsigned char* image_data);
 		~Render();
 		void addImage(int x, int y, const Coords& coords, int offX, int offY);
 		void addImage(int x, int y, const Coords& coords);
-		void setMovement(float offX, float offY, int objOffset);
-		void render(int fps, int scroll = 180);
+		void setMovement(int moveX, int moveY);
+		void render(int fps, Level& level);
 };
 
 #endif 

@@ -1,6 +1,21 @@
 #include "window.h"
 
-GLFWwindow* createWindow(int width, int height, wType type) {
+GLFWwindow* Window::window_;
+int Window::width_, Window::height_;
+Window::InitWindow Window::init;
+
+Window::InitWindow::InitWindow() {
+	width_=0, height_=0;
+	if (!glfwInit())
+		return;
+
+	window_ = glfwCreateWindow(1, 1, "Pancho and the Cloak of a Million Colors", NULL, NULL);
+
+	if (!window_)
+		glfwTerminate();
+}
+/*
+GLFWwindow* createWindow() {
 	GLFWwindow* window;
 
 	if (!glfwInit())
@@ -34,4 +49,4 @@ GLFWwindow* createWindow(int width, int height, wType type) {
 	}
 
 	return window;	
-}
+}*/

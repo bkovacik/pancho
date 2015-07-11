@@ -9,6 +9,22 @@
 
 enum wType {WINDOWED, BORDERLESS, FULLSCREEN};
 
-GLFWwindow* createWindow(int width, int height, wType type);
+class Window {
+	static GLFWwindow* window_;
+	static int width_, height_;
+
+	static class InitWindow {
+		public:
+			InitWindow();
+			~InitWindow() {glfwTerminate();}
+	} init;
+
+	public:
+		static GLFWwindow* getWindow() {return window_;}
+		static int getWidth() {return width_;}
+		static int getHeight() {return height_;}
+		static void setWidth(int width) {width_ = width;glViewport(0, 0, width_, height_);glfwSetWindowSize(window_, width_, height_);}
+		static void setHeight(int height) {height_ = height;glViewport(0, 0, width_, height_);glfwSetWindowSize(window_, width_, height_);}
+};
 
 #endif

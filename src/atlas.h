@@ -4,6 +4,8 @@
 #ifndef ATLAS_H
 #define ATLAS_H
 
+#define ATLASNAME "resources/atlasMap.csv"
+
 #include <fstream>
 #include <map>
 
@@ -19,11 +21,18 @@ class Coords {
 };
 
 class Atlas {
-	private:
-		std::map<std::string, Coords> textures;
+	static std::map<std::string, Coords> textures_;
+	static int width_, height_;
+
+	static class InitAtlas {
+		public:
+			InitAtlas();
+	} init;
+
 	public:
-		Atlas(const char* name);
-		Coords getCoords(const char* key) { return textures[key]; }
+		static Coords getCoords(const char* key) {return textures_[key];}
+		static int getWidth() {return width_;}
+		static int getHeight() {return height_;}
 };
 
 #endif

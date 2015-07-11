@@ -12,30 +12,24 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 int main() {
 	Image image = Image("resources/atlas.png");
-	Atlas atlas = Atlas("resources/atlasMap.csv");
 	Level level = Level("resources/test_level.csv");
 	audio = new Audio();
 	audio->addSource(0, 0, "name");
 	audio->addAudio("power_down_chime.wav", "name", "resources/sounds/");
 
-	GLFWwindow* window = createWindow(640, 480, WINDOWED);
-	if (!window)
+	if (!Window::getWindow())
 		return -1;
 	else {
-		glfwMakeContextCurrent(window);
-		glfwSetKeyCallback(window, key_callback);
+		glfwMakeContextCurrent(Window::getWindow());
+		glfwSetKeyCallback(Window::getWindow(), key_callback);
 
 		//bottom left = (0, 0)
-		render = new Render(194, 130, image.getImage_data(), window);
-		
-		for (int i = -128; i < 640; i+=128) {
-			for (int j = -128; j < 480; j+=128)
-				render->addImage(i, j, atlas.getCoords("background"));
-		}
+		render = new Render(194, 130, image.getImage_data());
 
-		level.load(render, atlas);
+		Window::setWidth(640);
+		Window::setHeight(480);
 
-		render->render(60);
+		render->render(60, level);
 	}	
 
 	delete(render);
@@ -46,10 +40,8 @@ int main() {
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	int x = 0, y = 0, move = 180.0;
 
-	if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
-		audio->playSource("name");
+	if (glfwGetKey(window, GLFW_KEY_RIGHT))
 		x += move;
-	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT))
 		x -= move;
 	if (glfwGetKey(window, GLFW_KEY_UP))
@@ -58,5 +50,5 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		y -= move;
 
 	for (int i = 0; i < 30; i++)
-		render->setMovement(-x, -y, i*2);
+		render->setMovement(x, y);
 }

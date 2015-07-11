@@ -1,9 +1,10 @@
 #include "render.h"
 
-Render::Render(int width, int height, unsigned char* image_data, GLFWwindow* window) {
+Render::Render(int width, int height, unsigned char* image_data) {
 	this->width = width;
 	this->height = height;
-	this->window = window;
+	this->moveX = 0;
+	this->moveY = 0;
 	this->frames = 0;
 	this->lastTime = glfwGetTime();
 
@@ -22,12 +23,10 @@ Render::Render(int width, int height, unsigned char* image_data, GLFWwindow* win
 	//init vbo
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(GLfloat), &vertices[0], GL_DYNAMIC_DRAW);
 
 	//init ebo
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size()*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
 
 	GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
 	glEnableVertexAttribArray(posAttrib);
@@ -54,12 +53,12 @@ Render::~Render() {
 void Render::initVertexShader() {
 	vertexSource =
 		"#version 330 core\n"
-		"in vec2 texcoord;"
 		"in vec2 position;"
+		"in vec2 texcoord;"
 		"out vec2 Texcoord;"
 		"void main() {"
-		"	Texcoord = texcoord;"
 		"	gl_Position = vec4(position, 0.0, 1.0);"
+		"	Texcoord = texcoord;"
 		"}";
 
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -114,8 +113,7 @@ void Render::bindTexture(unsigned char* image_data) {
 }
 
 void Render::shiftImage(float offX, float offY, int objOffset) {
-	int windowX, windowY;
-	glfwGetWindowSize(window, &windowX, &windowY);
+	int windowX = Window::getHeight(), windowY = Window::getWidth();
 
 	float 	ox = offX/windowX,
 		oy = offY/windowY;
@@ -131,8 +129,7 @@ void Render::shiftImage(float offX, float offY, int objOffset) {
 //takes x and y values as coords the image is supposed to be placed at
 //the coords structure is gotten from the texture atlas
 void Render::addImage(int x, int y, const Coords& coords, int offX, int offY) {
-	int windowX, windowY;
-	glfwGetWindowSize(window, &windowX, &windowY);
+	int windowX = Window::getHeight(), windowY = Window::getWidth();
 
 	float 	bx = x*2.0/windowX - 1.0,
 		by = y*2.0/windowY - 1.0,
@@ -173,61 +170,56 @@ void Render::addImage(int x, int y, const Coords& coords) {
 	addImage(x, y, coords, offX, offY);
 }
 
-void Render::setMovement(float offX, float offY, int objOffset) {
-	move[objOffset++] = offX;
-	move[objOffset] = offY;
+void Render::setMovement(int moveX, int moveY) {
+	this->moveX = moveX;
+	this->moveY = moveY;
+}
+
+void Render::genElements(int max) {
+	int offset = 0;
+
+	for (int i = 0; i < max; i++) {
+		elements.push_back(i);
+
+		if (i%4==3) {
+			elements.push_back(i);
+			elements.push_back(i+1);
+		}
+	}
+
+	return;
 }
 
 //renders the vertices at the given fps
-void Render::render(int fps, int scroll) {
-	glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(GLfloat), &vertices[0], GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, elements.size()*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
+void Render::render(int fps, Level& level) {
+	genElements(level.getNumDraw()*4+1);
 
-	int windowX, windowY;
+	glBufferData(GL_ARRAY_BUFFER, level.getNumDraw()*16*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (level.getNumDraw()*6-1)*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
+
+	int windowX = Window::getHeight(), windowY = Window::getWidth();
 	double delay = 1.0/fps;
 
-	glfwGetWindowSize(window, &windowX, &windowY);
-
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(Window::getWindow()))
 	{
 		double currentTime = glfwGetTime();
+		printf("%f\n", 1.0/(currentTime - lastTime));
+
 		if (currentTime - lastTime >= delay) {
 			lastTime = currentTime;
 			glfwPollEvents();
+			level.shiftOrigin((float) moveX/fps, (float) moveY/fps);
 
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			for (int i = 0; i < move.size(); i+=2) {
-				int	xMove = scroll/fps,
-					yMove = scroll/fps,
-					//round up
-					roundX = ((windowX + BACK_TEX_WIDTH - 1) / BACK_TEX_WIDTH) * BACK_TEX_WIDTH,
-					roundY = ((windowY + BACK_TEX_HEIGHT - 1) / BACK_TEX_HEIGHT) * BACK_TEX_HEIGHT,
-					//add another tex dimension, then multiply whole thing by two, then subtract one step
-					xWrap = (roundX + BACK_TEX_WIDTH) * 2 - xMove,
-					yWrap = (roundY + BACK_TEX_HEIGHT) * 2 - yMove;
+			level.populate();
 
-				float	wrapAtX = (float) roundX / windowX,
-					wrapAtY = (float) roundY / windowY;
+			glBufferSubData(GL_ARRAY_BUFFER, 0, level.getDrawVert().size()*sizeof(GLfloat), &level.getDrawVert()[0]);
 
-				//wrap background tiles around
-				if (vertices[i*8+4] < -wrapAtX)
-					shiftImage(xWrap, 0, i*8);
-				if (vertices[i*8] > wrapAtX)
-					shiftImage(-xWrap, 0, i*8);
-				if (vertices[i*8+1] < -wrapAtY)
-					shiftImage(0, yWrap, i*8);
-				if (vertices[i*8+9] > wrapAtY)
-					shiftImage(0, -yWrap, i*8);
-				else
-					//normalize movement by fps
-					shiftImage(move[i]/fps, move[i+1]/fps,i*8);
-			}
+			glDrawElements(GL_TRIANGLE_STRIP, level.getDrawVert().size(), GL_UNSIGNED_INT, 0);
 
-			glDrawElements(GL_TRIANGLE_STRIP, elements.size(), GL_UNSIGNED_INT, 0);
-
-			glfwSwapBuffers(window);
+			glfwSwapBuffers(Window::getWindow());
 		}
 	}
 	
