@@ -8,11 +8,11 @@
 
 Render * render; //needs to be global because GLFW is pure C
 Audio * audio;
+Level * level;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-int main() {
+int main(int argv, char** argc) {
 	Image image = Image("resources/atlas.png");
-	Level level = Level("resources/test_level.csv");
 	audio = new Audio();
 	audio->addSource(0, 0, "name");
 	audio->addAudio("power_down_chime.wav", "name", "resources/sounds/");
@@ -29,26 +29,23 @@ int main() {
 		Window::setWidth(640);
 		Window::setHeight(480);
 
-		render->render(60, level);
+		if (argv < 2) {
+			printf("Needs at least 1 arg to run.");
+			return -1;
+		}
+		std::string lname = "resources/";
+		lname += argc[1];
+		level = new Level(lname.c_str());
+
+		render->render(60, *level);
 	}	
 
 	delete(render);
 	delete(audio);
+	delete(level);
 	return 0;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	int x = 0, y = 0, move = 180.0;
-
-	if (glfwGetKey(window, GLFW_KEY_RIGHT))
-		x += move;
-	if (glfwGetKey(window, GLFW_KEY_LEFT))
-		x -= move;
-	if (glfwGetKey(window, GLFW_KEY_UP))
-		y += move;
-	if (glfwGetKey(window, GLFW_KEY_DOWN))
-		y -= move;
-
-	for (int i = 0; i < 30; i++)
-		render->setMovement(x, y);
+	level->onKey(key, action);
 }

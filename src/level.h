@@ -7,8 +7,7 @@
 #include <fstream>
 #include <map>
 #include <vector>
-#include "supertypes.h"
-#include "objects/pancho.h"
+#include "objects/factory.h"
 #include "atlas.h"
 #include "window.h"
 #include <iostream>
@@ -30,26 +29,39 @@ static bool operator<(const Point& pt1, const Point& pt2) {
 class Level {
 	private:
 		int toGrid(int position, int dimension) { return (int) ((float) dimension/position) + 0.5;}
+		void checkCollObj(Drawing* object);
+		void populate();
+		void checkCollisions();
 
 		std::map<std::string, Point> positions;
 		std::map<Point, std::string> enemies;
 		std::map<Point, std::string> pwr_ups;
 
 		std::vector<std::vector<std::vector<Drawing*> > > draw;
+		std::vector<Global*> drawGlobal;
 		std::vector<float> vertices;
 
 		int numDraw, width, height;
-		float originX, originY;
+		float originX, originY, moveX, moveY, gravity;
+		bool orientation;
 	public:
 		Level(const char* name);
 		~Level();
 		int getWidth() { return positions["Size"].pt_X; }
 		int getHeight() { return positions["Size"].pt_Y; }
-		int getNumDraw() { return numDraw; }
+
 		int start(const std::string& cord);
 		int goal(const std::string& cord);
-		void populate();
-		void shiftOrigin(float x, float y) { originX += x; originY += y; }
+
+		void deleteFrom(Drawing* object);
+		void onKey(int key, int action);
+		void setOrient(bool orientation);
+		void step(int fps);
+
+		void setMove(float x, float y) { moveX=x; moveY=y; }
+		void getMove(float& x, float& y) { x=moveX; y=moveY; }
+		void shift(float x, float y) { originX += x; originY += y; }
+		void getOrigin(float& x, float& y) { x=originX; y=originY; }
 		//void load(Render* render);
 
 		std::vector<float> getDrawVert() { return vertices; }

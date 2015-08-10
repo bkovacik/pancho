@@ -30,11 +30,15 @@ Render::Render(int width, int height, unsigned char* image_data) {
 
 	GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
 	glEnableVertexAttribArray(posAttrib);
-	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+	glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), 0);
 
 	GLint texAttrib = glGetAttribLocation(shaderProgram, "texcoord");
 	glEnableVertexAttribArray(texAttrib);
-	glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+	glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(2 * sizeof(GLfloat)));
+
+	GLint oriAttrib = glGetAttribLocation(shaderProgram, "orientation");
+	glEnableVertexAttribArray(oriAttrib);
+	glVertexAttribPointer(oriAttrib, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (void*)(4 * sizeof(GLfloat)));
 
 	bindTexture(image_data);
 }
@@ -55,10 +59,13 @@ void Render::initVertexShader() {
 		"#version 330 core\n"
 		"in vec2 position;"
 		"in vec2 texcoord;"
+		"in vec2 orientation;"
 		"out vec2 Texcoord;"
+		"out vec2 Orientation;"
 		"void main() {"
 		"	gl_Position = vec4(position, 0.0, 1.0);"
 		"	Texcoord = texcoord;"
+		"	Orientation = orientation;"
 		"}";
 
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -70,10 +77,12 @@ void Render::initFragmentShader() {
 	fragmentSource =
 		"#version 330 core\n"
 		"in vec2 Texcoord;"
+		"in vec2 Orientation;"
 		"out vec4 outColor;"
 		"uniform sampler2D tex;"
 		"void main() {"
-		"	outColor = texture(tex, Texcoord);"
+		"	vec2 v = vec2(Texcoord[0]*(1-Orientation[0])+Orientation[1]*Orientation[0], Texcoord[1]);"
+		"	outColor = texture(tex, v);"
 		"}";
 
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -177,6 +186,7 @@ void Render::setMovement(int moveX, int moveY) {
 
 void Render::genElements(int max) {
 	int offset = 0;
+	elements.resize(0);
 
 	for (int i = 0; i < max; i++) {
 		elements.push_back(i);
@@ -192,10 +202,12 @@ void Render::genElements(int max) {
 
 //renders the vertices at the given fps
 void Render::render(int fps, Level& level) {
-	genElements(level.getNumDraw()*4+1);
+	int numDraw = level.getDrawVert().size();
 
-	glBufferData(GL_ARRAY_BUFFER, level.getNumDraw()*16*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (level.getNumDraw()*6-1)*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
+	genElements(numDraw*4+1);
+
+	glBufferData(GL_ARRAY_BUFFER, numDraw*20*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (numDraw*6-1)*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
 
 	int windowX = Window::getHeight(), windowY = Window::getWidth();
 	double delay = 1.0/fps;
@@ -203,17 +215,24 @@ void Render::render(int fps, Level& level) {
 	while (!glfwWindowShouldClose(Window::getWindow()))
 	{
 		double currentTime = glfwGetTime();
-		printf("%f\n", 1.0/(currentTime - lastTime));
 
 		if (currentTime - lastTime >= delay) {
+			if (numDraw < level.getDrawVert().size()) {
+				numDraw = level.getDrawVert().size();
+
+				genElements(numDraw*4+1);
+
+				glBufferData(GL_ARRAY_BUFFER, numDraw*20*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, (numDraw*6-1)*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
+			}
+
 			lastTime = currentTime;
 			glfwPollEvents();
-			level.shiftOrigin((float) moveX/fps, (float) moveY/fps);
 
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			level.populate();
+			level.step(fps);
 
 			glBufferSubData(GL_ARRAY_BUFFER, 0, level.getDrawVert().size()*sizeof(GLfloat), &level.getDrawVert()[0]);
 
