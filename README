@@ -1,3 +1,10 @@
+//INSTRUCTIONS FOR RUNNING
+run a from a cmd prompt with the name of some level found in /resources:
+
+a test_level1.csv
+
+
+//INSTRUCTIONS FOR COMPILATION
 we're using mingw-w64 (http://mingw-w64.yaxm.org/doku.php/download/mingw-builds)
 
 LIB_DIR = mingw64\lib
@@ -16,7 +23,7 @@ put the .a's in LIB_DIR
 put the .h's in INC_DIR
 
 download openALsoft (http://kcat.strangesoft.net/openal-soft-1.16.0-bin.zip)
-put the .dll.a (found in libs/Win64) in LIB_DIR
+put the .dll.a (found in libs/Win64) in LIB_DIR, then rename it so that the .dll.a becomes .a
 put the entire AL folder in INC_DIR
 
 for tiles that need to be lined up and tiled seamlessly, they must have 1 pixel border that correctly interpolates between it and neighboring tiles. the tile is still read without the 1 pixel border.
