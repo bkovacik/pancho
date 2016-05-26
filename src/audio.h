@@ -17,18 +17,22 @@
 
 class Audio {
 	private:
-		void initListener();
+		static void initListener();
 
-		std::map<std::string, char*> audio;
-		std::map<std::string, ALuint> sources;
-		ALCdevice* device;
-		ALCcontext* context;
+		static std::map<std::string, char*> audio;
+		static std::map<std::string, ALuint> sources;
+		static ALCdevice* device;
+		static ALCcontext* context;
+
+		static class InitAudio {
+			public:
+				InitAudio();
+				~InitAudio();
+		} init;
 	public:
-		Audio();
-		~Audio();
-		void addAudio(std::string name, std::string sourceName, const char* path);
-		void addSource(float x, float y, std::string name);
-		void playSource(std::string name);
+		static void addAudio(std::string name, std::string sourceName, const char* path);
+		static void addSource(float x, float y, std::string name);
+		static void playSource(std::string name);
 };
 
 #endif

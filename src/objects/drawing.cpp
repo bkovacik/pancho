@@ -31,11 +31,8 @@ sides Drawing::isCollide(Drawing* object, float offsetX, float offsetY) {
 	int tbeginX = position.beginX, tendX = position.endX,
 		tbeginY = position.beginY, tendY = position.endY;
 
-	if (!(pos1.beginX > pos2.endX ||
-		pos1.endX < pos2.beginX ||
-		pos1.beginY > pos2.endY ||
-		pos1.endY < pos2.beginY)) {
-
+	if (!(pos1.beginX > pos2.endX || pos1.endX < pos2.beginX) &&
+		!(pos1.beginY > pos2.endY || pos1.endY < pos2.beginY)) {
 		float totalX = (pos1.endX - pos1.beginX + pos2.endX - pos2.endX)/2.0;
 		float totalY = (pos1.endY - pos1.beginY + pos2.endY - pos2.endY)/2.0;
 		float diffX, diffY;
@@ -54,13 +51,14 @@ sides Drawing::isCollide(Drawing* object, float offsetX, float offsetY) {
 			else if (pos1.endY > pos2.endY)
 				return DOWN;
 		}
-		else {
+		else if (diffY/totalY < diffX/totalX) {
 			if (pos1.beginX < pos2.beginX)
 				return RIGHT;
 			else if (pos1.endX > pos2.endX)
 				return LEFT;
 		}
-		return IN;
+		else
+			return IN;
 	}
 
 	return NONE;

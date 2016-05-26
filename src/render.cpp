@@ -56,38 +56,52 @@ Render::~Render() {
 
 void Render::initVertexShader() {
 	vertexSource =
-		"#version 330 core\n"
-		"in vec2 position;"
-		"in vec2 texcoord;"
-		"in vec2 orientation;"
-		"out vec2 Texcoord;"
-		"out vec2 Orientation;"
-		"void main() {"
-		"	gl_Position = vec4(position, 0.0, 1.0);"
-		"	Texcoord = texcoord;"
-		"	Orientation = orientation;"
+		"#version 150 core\n"
+		"in vec4 position;\n"
+		"in vec2 texcoord;\n"
+		"in vec2 orientation;\n"
+		"out vec2 Texcoord;\n"
+		"out vec2 Orientation;\n"
+		"void main() {\n"
+		"	gl_Position = position;\n"
+		"	Texcoord = texcoord;\n"
+		"	Orientation = orientation;\n"
 		"}";
 
 	vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexSource, NULL);
 	glCompileShader(vertexShader);
+
+	GLint bufflen = 0;
+  	glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &bufflen);
+	GLchar* log_string = new char[bufflen + 1];
+	glGetShaderInfoLog(vertexShader, bufflen, 0, log_string);
+	printf("%s\n", log_string);
+	delete log_string;
 }
 
 void Render::initFragmentShader() {
 	fragmentSource =
-		"#version 330 core\n"
-		"in vec2 Texcoord;"
-		"in vec2 Orientation;"
-		"out vec4 outColor;"
-		"uniform sampler2D tex;"
-		"void main() {"
-		"	vec2 v = vec2(Texcoord[0]*(1-Orientation[0])+Orientation[1]*Orientation[0], Texcoord[1]);"
-		"	outColor = texture(tex, v);"
+		"#version 150 core\n"
+		"in vec2 Texcoord;\n"
+		"in vec2 Orientation;\n"
+		"out vec4 outColor;\n"
+		"uniform sampler2D tex;\n"
+		"void main() {\n"
+		"	vec2 v = vec2(Texcoord[0]*(1-Orientation[0])+Orientation[1]*Orientation[0], Texcoord[1]);\n"
+		"	outColor = texture(tex, v);\n"
 		"}";
 
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
 	glCompileShader(fragmentShader);
+
+	GLint bufflen = 0;
+  	glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &bufflen);
+	GLchar* log_string = new char[bufflen + 1];
+	glGetShaderInfoLog(fragmentShader, bufflen, 0, log_string);
+	printf("%s\n", log_string);
+	delete log_string;
 }
 
 void Render::initShader() {
@@ -204,10 +218,10 @@ void Render::genElements(int max) {
 void Render::render(int fps, Level& level) {
 	int numDraw = level.getDrawVert().size();
 
-	genElements(numDraw*4+1);
+	genElements(numDraw/5+1);
 
-	glBufferData(GL_ARRAY_BUFFER, numDraw*20*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (numDraw*6-1)*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, numDraw*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, (numDraw/10*3-1)*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
 
 	int windowX = Window::getHeight(), windowY = Window::getWidth();
 	double delay = 1.0/fps;
@@ -222,8 +236,8 @@ void Render::render(int fps, Level& level) {
 
 				genElements(numDraw*4+1);
 
-				glBufferData(GL_ARRAY_BUFFER, numDraw*20*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
-				glBufferData(GL_ELEMENT_ARRAY_BUFFER, (numDraw*6-1)*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, numDraw*sizeof(GLfloat), NULL, GL_DYNAMIC_DRAW);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, (numDraw/10*3-1)*sizeof(GLuint), &elements[0], GL_DYNAMIC_DRAW);
 			}
 
 			lastTime = currentTime;
@@ -236,7 +250,7 @@ void Render::render(int fps, Level& level) {
 
 			glBufferSubData(GL_ARRAY_BUFFER, 0, level.getDrawVert().size()*sizeof(GLfloat), &level.getDrawVert()[0]);
 
-			glDrawElements(GL_TRIANGLE_STRIP, level.getDrawVert().size(), GL_UNSIGNED_INT, 0);
+			glDrawElements(GL_TRIANGLE_STRIP, level.getDrawVert().size()/10*3-1, GL_UNSIGNED_INT, 0);
 
 			glfwSwapBuffers(Window::getWindow());
 		}

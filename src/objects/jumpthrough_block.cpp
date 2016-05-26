@@ -7,9 +7,9 @@ JumpThrough::JumpThrough(int beginX, int beginY, int endX, int endY) : Block(beg
 	statemap["through"] = v_default;
 }
 
-void JumpThrough::onKey(Level* level, int key, int action) {
-	if (key == GLFW_KEY_DOWN)
+void JumpThrough::onKey(Level* level, key key, int action) {
+	if (key == KEY_DOWN)
 		state = "through";
-	else if (key == GLFW_KEY_UP)
+	else if (key == KEY_UP)
 		state = "default";
 }

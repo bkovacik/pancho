@@ -1,6 +1,12 @@
 #include "audio.h"
 
-Audio::Audio() {
+std::map<std::string, char*> Audio::audio;
+std::map<std::string, ALuint> Audio::sources;
+ALCdevice* Audio::device;
+ALCcontext* Audio::context;
+Audio::InitAudio Audio::init;
+
+Audio::InitAudio::InitAudio() {
 	device = alcOpenDevice(NULL);
 
 	context = alcCreateContext(device, NULL);
@@ -9,7 +15,7 @@ Audio::Audio() {
 	initListener();
 }
 
-Audio::~Audio() {
+Audio::InitAudio::~InitAudio() {
 	//deallocate all of the char pointers
 	for (std::map<std::string, char*>::iterator it = audio.begin(); it != audio.end(); it++)
 		free(it->second);

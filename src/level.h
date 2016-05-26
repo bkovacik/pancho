@@ -10,7 +10,7 @@
 #include "objects/factory.h"
 #include "atlas.h"
 #include "window.h"
-#include <iostream>
+#include "keytranslate.h"
 
 struct Point {
 	int pt_X = 0;
@@ -38,14 +38,14 @@ class Level {
 		std::map<Point, std::string> pwr_ups;
 
 		std::vector<std::vector<std::vector<Drawing*> > > draw;
-		std::vector<Global*> drawGlobal;
+		std::vector<Drawing*> drawGlobal;
 		std::vector<float> vertices;
 
-		int numDraw, width, height;
+		int numDraw, width, height, fps;
 		float originX, originY, moveX, moveY, gravity;
 		bool orientation;
 	public:
-		Level(const char* name);
+		Level(std::string name);
 		~Level();
 		int getWidth() { return positions["Size"].pt_X; }
 		int getHeight() { return positions["Size"].pt_Y; }
@@ -53,15 +53,16 @@ class Level {
 		int start(const std::string& cord);
 		int goal(const std::string& cord);
 
+		void createAt(std::string key, int x, int y);
 		void deleteFrom(Drawing* object);
-		void onKey(int key, int action);
-		void setOrient(bool orientation);
+		void onKey(key key, int action);
 		void step(int fps);
 
 		void setMove(float x, float y) { moveX=x; moveY=y; }
 		void getMove(float& x, float& y) { x=moveX; y=moveY; }
 		void shift(float x, float y) { originX += x; originY += y; }
 		void getOrigin(float& x, float& y) { x=originX; y=originY; }
+		float getGravity() { return this->gravity/fps; }
 		//void load(Render* render);
 
 		std::vector<float> getDrawVert() { return vertices; }

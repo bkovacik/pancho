@@ -10,4 +10,6 @@ Factory::InitFactory::InitFactory() {
 	funcmap4_["crumble"] = Factory::createObject<Crumble>;
 	funcmap4_["spikes"] = Factory::createObject<Spikes>;
 	funcmap4_["jumpthrough"] = Factory::createObject<JumpThrough>;
+	funcmap4_["ladder"] = Factory::createObject<Ladder>;
+	funcmap4_["blob"] = Factory::createObject<Blob>;
 }

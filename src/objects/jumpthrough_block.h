@@ -8,7 +8,7 @@
 class JumpThrough : public Block {
 	public:
 		JumpThrough(int beginX, int beginY, int endX, int endY);
-		void onKey(Level* level, int key, int action);
+		void onKey(Level* level, key key, int action);
 };
 
 #endif

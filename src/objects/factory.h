@@ -10,6 +10,8 @@
 #include "crumble_block.h"
 #include "spikes_block.h"
 #include "jumpthrough_block.h"
+#include "ladder_block.h"
+#include "blob_enemy.h"
 
 class Factory;
 

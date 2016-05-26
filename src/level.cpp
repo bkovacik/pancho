@@ -1,7 +1,11 @@
 #include "level.h"
 
-Level::Level(const char* name) {
-	std::ifstream fin (name, std::ifstream::in);
+Level::Level(std:: string name) {
+	std::ifstream fin (name.c_str(), std::ifstream::in);
+	if (!fin) {
+		fprintf(stderr, "File not found.\n");
+		exit(-1);
+	}
 	std::string str;
 	int line = 1;
 
@@ -37,15 +41,15 @@ Level::Level(const char* name) {
 		key = str.substr(0, index);
 		positions[key] = Point();
 
+		if (!key.length() || key[0] < 'A' || key[0] > 'z')
+			break;
+
 		index++;
 		int x = std::stoi(str.substr(index, str.find(",", index)-index));
 		index = str.find(",", index)+1;
 		int y = std::stoi(str.substr(index));
 
-		if (Global* newObject = dynamic_cast<Global*>(Factory::getNewObject(key, x, y, x+32, y+32)))
-			drawGlobal.push_back(newObject);
-		else if (Drawing* newObject = dynamic_cast<Drawing*>(Factory::getNewObject(key, x, y, x+32, y+32)))
-			draw[toGrid(640/2, x)][toGrid(480/2, y)].push_back(newObject);
+		createAt(key, x, y);
 	}
 
 	fin.close();
@@ -75,7 +79,7 @@ void Level::checkCollObj(Drawing* object) {
 	}
 
 	for (int i = 0; i < drawGlobal.size(); i++) {
-		Global* collide = drawGlobal[i];
+		Drawing* collide = drawGlobal[i];
 		sides side = NONE;
 		if (collide != object)
 			side = collide->isCollide(object, originX, originY);
@@ -126,6 +130,16 @@ int Level::goal(const std::string& cord) {
 	if (cord == "Y") return positions["Goal"].pt_Y;
 }
 
+void Level::createAt(std::string key, int x, int y) {
+	GameObject* newObject = Factory::getNewObject(key, x, y, x+32, y+32);
+	if (Drawing* newDraw = dynamic_cast<Drawing*>(newObject)) {
+		if (newDraw->getAlwaysDraw())
+			drawGlobal.push_back(newDraw);
+		else
+			draw[toGrid(640/2, x)][toGrid(480/2, y)].push_back(newDraw);
+	}		
+}
+
 void Level::deleteFrom(Drawing* object) {
 	for (int i = 0; i < draw.size(); i++) {
 		for (int j = 0; j < draw[i].size(); j++) {
@@ -143,7 +157,7 @@ void Level::deleteFrom(Drawing* object) {
 	delete(object);
 }
 
-void Level::onKey(int key, int action) {
+void Level::onKey(key key, int action) {
 	for (int i = 0; i < draw.size(); i++) {
 		for (int j = 0; j < draw[i].size(); j++) {
 			for (int k = 0; k < draw[i][j].size(); k++)
@@ -155,22 +169,8 @@ void Level::onKey(int key, int action) {
 		drawGlobal[i]->onKey(this, key, action);
 }
 
-void Level::setOrient(bool orientation) {
-	if (this->orientation != orientation) {
-		this->orientation = orientation;
-		for (int i = 0; i < draw.size(); i++) {
-			for (int j = 0; j < draw[i].size(); j++) {
-				for (int k = 0; k < draw[i][j].size(); k++)
-					draw[i][j][k]->orientChanged();
-			}
-		}
-
-		for (int i = 0; i < drawGlobal.size(); i++)
-			drawGlobal[i]->orientChanged();
-	}
-}
-
 void Level::step(int fps) {
+	this->fps = fps;
 	moveY -= gravity/fps;
 
 	for (int i = 0; i < draw.size(); i++) {

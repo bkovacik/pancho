@@ -1,21 +1,24 @@
 #include <iostream>
+#include <fstream>
 #include "render.h"
 #include "window.h"
 #include "image.h"
 #include "atlas.h"
 #include "level.h"
 #include "audio.h"
+#include "keytranslate.h"
 
-Render * render; //needs to be global because GLFW is pure C
-Audio * audio;
-Level * level;
+Render* render; //needs to be global because GLFW is pure C
+Level* level;
+KeyTranslate * keytranslate;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 int main(int argv, char** argc) {
 	Image image = Image("resources/atlas.png");
-	audio = new Audio();
-	audio->addSource(0, 0, "name");
-	audio->addAudio("power_down_chime.wav", "name", "resources/sounds/");
+	Audio::addSource(0, 0, "name");
+	Audio::addAudio("power_down_chime.wav", "name", "resources/sounds/");
+	Audio::playSource("name");
+	keytranslate = new KeyTranslate();
 
 	if (!Window::getWindow())
 		return -1;
@@ -30,22 +33,23 @@ int main(int argv, char** argc) {
 		Window::setHeight(480);
 
 		if (argv < 2) {
-			printf("Needs at least 1 arg to run.");
+			fprintf(stderr, "Needs at least 1 arg to run.");
 			return -1;
 		}
+		
 		std::string lname = "resources/";
 		lname += argc[1];
-		level = new Level(lname.c_str());
+
+		level = new Level(lname);
 
 		render->render(60, *level);
 	}	
 
 	delete(render);
-	delete(audio);
 	delete(level);
 	return 0;
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	level->onKey(key, action);
+	level->onKey(keytranslate->getKey(key), action);
 }
