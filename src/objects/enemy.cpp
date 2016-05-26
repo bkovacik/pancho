@@ -1,6 +1,6 @@
-#include "enemy.h"
-#include "block.h"
-#include "../level.h"
+#include "../../include/objects/enemy.h"
+#include "../../include/objects/block.h"
+#include "../../include/level.h"
 
 Enemy::Enemy(int beginX, int beginY, int endX, int endY, Coords coords) :
 	Drawing(beginX, beginY, endX, endY, coords) {

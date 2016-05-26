@@ -1,5 +1,5 @@
-#include "crumble_block.h"
-#include "../level.h"
+#include "../../include/objects/crumble_block.h"
+#include "../../include/level.h"
 
 Crumble::Crumble(int beginX, int beginY, int endX, int endY) : Block(beginX, beginY, endX, endY) {
 	std::vector<Coords> v_crumbling = std::vector<Coords>(20, Atlas::getCoords("green"));

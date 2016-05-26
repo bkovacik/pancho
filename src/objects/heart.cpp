@@ -1,4 +1,4 @@
-#include "heart.h"
+#include "../../include/objects/heart.h"
 
 Heart::Heart(int beginX, int beginY, int endX, int endY, full full) :
 	Global(beginX, beginY, endX, endY, Atlas::getCoords("red")) {

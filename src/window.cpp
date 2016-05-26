@@ -1,4 +1,4 @@
-#include "window.h"
+#include "../include/window.h"
 
 GLFWwindow* Window::window_;
 int Window::width_, Window::height_;

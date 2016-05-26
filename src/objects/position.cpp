@@ -1,4 +1,4 @@
-#include "position.h"
+#include "../../include/objects/position.h"
 
 void Position::genPosition(int width, int height, int originX, int originY)
 {

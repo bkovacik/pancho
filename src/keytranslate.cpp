@@ -1,4 +1,4 @@
-#include "keytranslate.h"
+#include "../include/keytranslate.h"
 
 KeyTranslate::KeyTranslate() {
 	tmap[GLFW_KEY_RIGHT] = KEY_RIGHT;

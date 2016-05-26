@@ -1,12 +1,12 @@
 #include <iostream>
 #include <fstream>
-#include "render.h"
-#include "window.h"
-#include "image.h"
-#include "atlas.h"
-#include "level.h"
-#include "audio.h"
-#include "keytranslate.h"
+#include "../include/render.h"
+#include "../include/window.h"
+#include "../include/image.h"
+#include "../include/atlas.h"
+#include "../include/level.h"
+#include "../include/audio.h"
+#include "../include/keytranslate.h"
 
 Render* render; //needs to be global because GLFW is pure C
 Level* level;

@@ -1,4 +1,4 @@
-#include "atlas.h"
+#include "../include/atlas.h"
 
 std::map<std::string, Coords> Atlas::textures_;
 int Atlas::width_, Atlas::height_;

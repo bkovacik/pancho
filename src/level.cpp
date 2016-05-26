@@ -1,4 +1,4 @@
-#include "level.h"
+#include "../include/level.h"
 
 Level::Level(std:: string name) {
 	std::ifstream fin (name.c_str(), std::ifstream::in);

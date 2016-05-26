@@ -1,4 +1,4 @@
-#include "audio.h"
+#include "../include/audio.h"
 
 std::map<std::string, char*> Audio::audio;
 std::map<std::string, ALuint> Audio::sources;

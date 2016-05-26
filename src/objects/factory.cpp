@@ -1,4 +1,4 @@
-#include "factory.h"
+#include "../../include/objects/factory.h"
 
 std::map<std::string, funcptr4> Factory::funcmap4_;
 std::map<std::string, funcptr2> Factory::funcmap2_;

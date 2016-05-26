@@ -1,4 +1,4 @@
-#include "render.h"
+#include "../include/render.h"
 
 Render::Render(int width, int height, unsigned char* image_data) {
 	this->width = width;
@@ -72,12 +72,14 @@ void Render::initVertexShader() {
 	glShaderSource(vertexShader, 1, &vertexSource, NULL);
 	glCompileShader(vertexShader);
 
+#if DEBUG
 	GLint bufflen = 0;
   	glGetShaderiv(vertexShader, GL_INFO_LOG_LENGTH, &bufflen);
 	GLchar* log_string = new char[bufflen + 1];
 	glGetShaderInfoLog(vertexShader, bufflen, 0, log_string);
 	printf("%s\n", log_string);
 	delete log_string;
+#endif
 }
 
 void Render::initFragmentShader() {
@@ -96,12 +98,14 @@ void Render::initFragmentShader() {
 	glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
 	glCompileShader(fragmentShader);
 
+#if DEBUG
 	GLint bufflen = 0;
   	glGetShaderiv(fragmentShader, GL_INFO_LOG_LENGTH, &bufflen);
 	GLchar* log_string = new char[bufflen + 1];
 	glGetShaderInfoLog(fragmentShader, bufflen, 0, log_string);
 	printf("%s\n", log_string);
 	delete log_string;
+#endif
 }
 
 void Render::initShader() {

@@ -1,4 +1,4 @@
-#include "cloak.h"
+#include "../../include/objects/cloak.h"
 
 Cloak::Cloak(int beginX, int beginY, int endX, int endY) :
 	cloak(100),

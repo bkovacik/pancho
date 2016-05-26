@@ -1,8 +1,8 @@
-#include "blob_enemy.h"
-#include "block.h"
-#include "pancho.h"
-#include "../level.h"
-#include "../atlas.h"
+#include "../../include/objects/blob_enemy.h"
+#include "../../include/objects/block.h"
+#include "../../include/objects/pancho.h"
+#include "../../include/level.h"
+#include "../../include/atlas.h"
 
 Blob::Blob(int beginX, int beginY, int endX, int endY) :
 	Enemy(beginX, beginY, endX, endY, Atlas::getCoords("red")) {

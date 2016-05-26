@@ -1,4 +1,4 @@
-#include "image.h"
+#include "../include/image.h"
 
 Image::Image(const char* name) {
 	FILE* image;

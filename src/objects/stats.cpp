@@ -1,5 +1,5 @@
-#include "stats.h"
-#include "cloak.h"
+#include "../../include/objects/stats.h"
+#include "../../include/objects/cloak.h"
 
 Stats::Stats() : hearts(3, Heart(0, 0, 0, 0, FULL)) {
 	Coords coords = Atlas::getCoords("lifefull");

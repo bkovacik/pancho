@@ -1,5 +1,5 @@
-#include "drawing.h"
-#include "../level.h"
+#include "../../include/objects/drawing.h"
+#include "../../include/level.h"
 
 //width and height of IMAGE
 void Drawing::genCoords(int width, int height) {
