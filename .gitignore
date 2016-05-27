@@ -1,1 +1,6 @@
 log
+*.exe
+CMakeCache.txt
+Makefile
+CMakefiles
+compile.bat
