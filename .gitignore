@@ -4,3 +4,4 @@ CMakeCache.txt
 Makefile
 CMakefiles
 compile.bat
+cmake_install.cmake
