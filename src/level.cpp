@@ -3,7 +3,7 @@
 Level::Level(std:: string name) {
 	std::ifstream fin (name.c_str(), std::ifstream::in);
 	if (!fin) {
-		fprintf(stderr, "File not found.\n");
+		fprintf(stderr, "Level file not found.\n");
 		exit(-1);
 	}
 	std::string str;

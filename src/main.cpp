@@ -18,7 +18,7 @@ int main(int argv, char** argc) {
 	Audio::addSource(0, 0, "name");
 	Audio::addAudio("power_down_chime.wav", "name", "resources/sounds/");
 	Audio::playSource("name");
-	keytranslate = new KeyTranslate();
+	keytranslate = new KeyTranslate("resources/keybindings.csv");
 
 	if (!Window::getWindow())
 		return -1;
