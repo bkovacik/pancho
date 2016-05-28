@@ -36,7 +36,7 @@ class Drawing : public Position {
 
 		virtual void onCollide(Drawing* object, Level* level, sides side) {}
 		virtual void onKey(Level* level, key key, int action) {}
-
+		virtual void onTrigger() {}
 		virtual void step(Level* level) { if (frame >= statemap[state].size()-1) frame = 0; else frame++; }
 		virtual void addCoords(std::vector<float>& v, int& offset) {
 			if (offset >= v.size())

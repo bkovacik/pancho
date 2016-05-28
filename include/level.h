@@ -32,8 +32,10 @@ class Level {
 		void checkCollObj(Drawing* object);
 		void populate();
 		void checkCollisions();
+		void trigger(std::string name);
 
 		std::map<std::string, Point> positions;
+		std::map<std::string, Drawing*> objects;
 		std::map<Point, std::string> enemies;
 		std::map<Point, std::string> pwr_ups;
 
@@ -53,7 +55,7 @@ class Level {
 		int start(const std::string& cord);
 		int goal(const std::string& cord);
 
-		void createAt(std::string key, int x, int y);
+		void createAt(std::string name, std::string key, int x, int y);
 		void deleteFrom(Drawing* object);
 		void onKey(key key, int action);
 		void step(int fps);

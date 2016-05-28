@@ -13,17 +13,17 @@ Level::Level(std:: string name) {
 	getline(fin, str);
 
 	//width and height
+	getline(fin, str, ',');
+	this->width = std::stoi(str);
 	getline(fin, str);
-	int index = str.find(",");
-	this->width = std::stoi(str.substr(0, index));
-	this->height = std::stoi(str.substr(index+1));
+	this->height = std::stoi(str);
 	this->draw = std::vector<std::vector<std::vector<Drawing*> > >(toGrid(Window::getWidth()/2, width), std::vector<std::vector<Drawing*> >(toGrid(Window::getHeight()/2, height), std::vector<Drawing*>()));
 
 	//origin
+	getline(fin, str, ',');
+	this->originX = std::stoi(str);
 	getline(fin, str);
-	index = str.find(",");
-	this->originX = std::stoi(str.substr(0, index));
-	this->originY = std::stoi(str.substr(index+1));
+	this->originY = std::stoi(str);
 	this->moveX = 0; this->moveY = 0;
 
 	//gravity
@@ -31,25 +31,26 @@ Level::Level(std:: string name) {
 	this->gravity = std::stof(str);
 
 	while (fin.good()) {
-		index = 0;
 		line++;
 
-		getline(fin, str);
+		std::string name;
+		getline(fin, name, ',');
 
 		std::string key;
-		index = str.find(",");
-		key = str.substr(0, index);
+		getline(fin, key, ',');
 		positions[key] = Point();
 
 		if (!key.length() || key[0] < 'A' || key[0] > 'z')
 			break;
 
-		index++;
-		int x = std::stoi(str.substr(index, str.find(",", index)-index));
-		index = str.find(",", index)+1;
-		int y = std::stoi(str.substr(index));
+		getline(fin, str, ',');
+		int x = std::stoi(str);
+		getline(fin, str);
+		int y = std::stoi(str);
 
-		createAt(key, x, y);
+		//fprintf(stderr, "%s %s %i %i", name.c_str(), key.c_str(), x, y);
+
+		createAt(name, key, x, y);
 	}
 
 	fin.close();
@@ -120,6 +121,10 @@ void Level::checkCollisions() {
 		checkCollObj(drawGlobal[i]);
 }
 
+void Level::trigger(std::string name) {
+
+}
+
 int Level::start(const std::string& cord) {
 	if (cord == "X") return positions["Start"].pt_X;
 	if (cord == "Y") return positions["Start"].pt_Y;
@@ -130,9 +135,17 @@ int Level::goal(const std::string& cord) {
 	if (cord == "Y") return positions["Goal"].pt_Y;
 }
 
-void Level::createAt(std::string key, int x, int y) {
+void Level::createAt(std::string name, std::string key, int x, int y) {
 	GameObject* newObject = Factory::getNewObject(key, x, y, x+32, y+32);
 	if (Drawing* newDraw = dynamic_cast<Drawing*>(newObject)) {
+		if (objects.find(name) != objects.end()) {
+		#if DEBUG
+			fprintf(stderr, "Object with name %s already exists!", name);
+		#endif
+		}
+		else
+			objects[name] = newDraw;
+	
 		if (newDraw->getAlwaysDraw())
 			drawGlobal.push_back(newDraw);
 		else
@@ -141,6 +154,13 @@ void Level::createAt(std::string key, int x, int y) {
 }
 
 void Level::deleteFrom(Drawing* object) {
+	for (std::map<std::string, Drawing*>::iterator it = objects.begin(); it != objects.end(); it++) {
+		if (it->second == object) {
+			objects.erase(it);
+			break;
+		}
+	}
+
 	for (int i = 0; i < draw.size(); i++) {
 		for (int j = 0; j < draw[i].size(); j++) {
 			for (int k = 0; k < draw[i][j].size(); k++)
