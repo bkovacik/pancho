@@ -32,7 +32,6 @@ class Level {
 		void checkCollObj(Drawing* object);
 		void populate();
 		void checkCollisions();
-		void trigger(std::string name);
 
 		std::map<std::string, Point> positions;
 		std::map<std::string, Drawing*> objects;
@@ -47,7 +46,7 @@ class Level {
 		float originX, originY, moveX, moveY, gravity;
 		bool orientation;
 	public:
-		Level(std::string name);
+		Level(std::string name, std::string triggers);
 		~Level();
 		int getWidth() { return positions["Size"].pt_X; }
 		int getHeight() { return positions["Size"].pt_Y; }
@@ -72,7 +71,5 @@ class Level {
 		const std::map<Point, std::string>& getEnemies() { return enemies; }
 		const std::map<Point, std::string>& getPower_Ups() { return pwr_ups; }
 };
-
-
 
 #endif

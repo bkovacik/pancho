@@ -11,6 +11,7 @@
 #include "spikes_block.h"
 #include "jumpthrough_block.h"
 #include "ladder_block.h"
+#include "trigger_block.h"
 #include "blob_enemy.h"
 
 class Factory;

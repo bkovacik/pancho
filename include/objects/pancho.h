@@ -19,6 +19,7 @@ class Spikes;
 class Blob;
 class JumpThrough;
 class Ladder;
+class Trigger;
 
 enum cloake {RED,ORANGE,YELLOW,GREEN,BLUE,INDIGO,VIOLET};
 

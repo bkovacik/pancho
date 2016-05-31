@@ -24,6 +24,18 @@ void Drawing::genCoords(int width, int height) {
 	}
 }
 
+void Drawing::addTrigger(Drawing* object, std::string trigger) {
+	if (triggers.find(object) != triggers.end())
+		triggers[object].push_back(trigger);
+	else
+		triggers[object] = std::vector<std::string>(1, trigger);
+}
+
+void Drawing::trigger(std::map<std::string, Drawing*> objects, Drawing* object) {
+	for (int i = 0; i < triggers[object].size(); i++)
+		objects[triggers[object][i]]->onTrigger();
+}
+
 sides Drawing::isCollide(Drawing* object, float offsetX, float offsetY) {
 	Coords pos1 = this->getPosition(offsetX, offsetY);
 	Coords pos2 = object->getPosition(offsetX, offsetY);

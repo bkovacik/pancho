@@ -17,6 +17,7 @@ class Drawing : public Position {
 		float moveX, moveY;
 		std::string state;
 		std::map<std::string, std::vector<Coords> > statemap;
+		std::map<Drawing*, std::vector<std::string> > triggers;
 		bool orientation; // true is facing right, false is facing left
 		bool alwaysDraw;
 	public:
@@ -30,8 +31,11 @@ class Drawing : public Position {
 		}
 		void changeState(std::string state) { if (statemap.count(state)) this->state = state; }
 		std::string getState() { return this->state; }
+		std::map<Drawing*, std::vector<std::string> > getTriggers() { return this->triggers; }
 		bool getAlwaysDraw() { return this->alwaysDraw; }
 		void genCoords(int width, int height);
+		void addTrigger(Drawing* object, std::string trigger);
+		void trigger(std::map<std::string, Drawing*> objects, Drawing* object);
 		sides isCollide(Drawing* object, float offsetX, float offsetY);
 
 		virtual void onCollide(Drawing* object, Level* level, sides side) {}

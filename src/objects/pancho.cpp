@@ -4,6 +4,7 @@
 #include "../../include/objects/spikes_block.h"
 #include "../../include/objects/blob_enemy.h"
 #include "../../include/objects/jumpthrough_block.h"
+#include "../../include/objects/trigger_block.h"
 #include "../../include/level.h"
 
 Pancho::Pancho(int beginX, int beginY, int endX, int endY) : health(6), numHearts(3), cloak(100), cloakColor(RED), invuln(0), numJumps(1), maxJumps(1), cloaks {"red", "orange", "yellow", "green", "blue", "indigo", "violet"},

@@ -32,15 +32,19 @@ int main(int argv, char** argc) {
 		Window::setWidth(640);
 		Window::setHeight(480);
 
-		if (argv < 2) {
-			fprintf(stderr, "Needs at least 1 arg to run.");
+		if (argv < 3) {
+			fprintf(stderr, "Needs at least 2 args to run.");
 			return -1;
 		}
 		
 		std::string lname = "resources/";
 		lname += argc[1];
 
-		level = new Level(lname);
+		std::string tname = "resources/";
+		tname += argc[2];
+
+		level = new Level(lname, tname);
+
 
 		render->render(60, *level);
 	}	

@@ -12,4 +12,5 @@ Factory::InitFactory::InitFactory() {
 	funcmap4_["jumpthrough"] = Factory::createObject<JumpThrough>;
 	funcmap4_["ladder"] = Factory::createObject<Ladder>;
 	funcmap4_["blob"] = Factory::createObject<Blob>;
+	funcmap4_["trigger"] = Factory::createObject<Trigger>;
 }

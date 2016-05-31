@@ -1,6 +1,6 @@
 #include "../include/level.h"
 
-Level::Level(std:: string name) {
+Level::Level(std::string name, std::string triggers) {
 	std::ifstream fin (name.c_str(), std::ifstream::in);
 	if (!fin) {
 		fprintf(stderr, "Level file not found.\n");
@@ -48,11 +48,33 @@ Level::Level(std:: string name) {
 		getline(fin, str);
 		int y = std::stoi(str);
 
-		//fprintf(stderr, "%s %s %i %i", name.c_str(), key.c_str(), x, y);
-
 		createAt(name, key, x, y);
 	}
 
+	fin.close();
+
+	//triggers
+	fin.open(triggers.c_str(), std::ifstream::in);
+	if (!fin) {
+		fprintf(stderr, "Triggers file not found.\n");
+		exit(-1);
+	}
+	//discard first line
+	getline(fin, str);
+	
+	while (fin.good()) {
+		std::string str2;
+		std::string str3;
+		
+		getline(fin, str, ',');
+		getline(fin, str2, ',');
+		getline(fin, str3);
+
+		if (!str.length() || str[0] < 'A' || str[0] > 'z')
+			break;
+
+		objects[str]->addTrigger(objects[str2], str3);
+	}
 	fin.close();
 }
 
@@ -73,8 +95,10 @@ void Level::checkCollObj(Drawing* object) {
 				sides side = NONE;
 				if (collide != object)
 					side = collide->isCollide(object, originX, originY);
-				if (side > NONE)
+				if (side > NONE) {
 					collide->onCollide(object, this, side);
+					collide->trigger(objects, object);
+				}				
 			}
 		}
 	}
@@ -84,8 +108,10 @@ void Level::checkCollObj(Drawing* object) {
 		sides side = NONE;
 		if (collide != object)
 			side = collide->isCollide(object, originX, originY);
-		if (side > NONE)
+		if (side > NONE) {
 			collide->onCollide(object, this, side);
+			collide->trigger(objects, object);
+		}
 	}
 }
 
@@ -119,10 +145,6 @@ void Level::checkCollisions() {
 
 	for (int i = 0; i < drawGlobal.size(); i++)
 		checkCollObj(drawGlobal[i]);
-}
-
-void Level::trigger(std::string name) {
-
 }
 
 int Level::start(const std::string& cord) {
